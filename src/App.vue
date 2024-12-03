@@ -1,26 +1,54 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div>
+    <h1>Menu Cantine</h1>
+  </div>
+  <div>
+    <input type="text" v-model="starter" placeholder="Entrée" />
+    <input type="text" v-model="MainCourse" placeholder="Plat" />
+    <input type="text" v-model="Dessert" placeholder="Dessert" />
+    <button @click="add">Ajouter</button>
+  </div>
+  <div>
+    <h2>Liste des menus</h2>
+    <ul>
+      <li v-for="(item, index) in ListMenu" :key="index">
+        - Entrée : {{ item.starter }} - Plat : {{ item.MainCourse }} - Dessert :  {{ item.Dessert }}
+      </li>
+    </ul>
+  </div>
 </template>
 
-<script>
-import HelloWorld from './components/HelloWorld.vue'
+<script setup>
+import { ref } from "vue";
 
-export default {
-  name: 'App',
-  components: {
-    HelloWorld
+const starter = ref("");
+const MainCourse = ref("");
+const Dessert = ref("");
+
+const ListMenu = ref([
+  {
+    starter: "Salade",
+    MainCourse: "Poulet",
+    Dessert: "Tarte aux pommes",
+  },
+]);
+
+const add = () => {
+  if (starter.value || MainCourse.value || Dessert.value) {
+    ListMenu.value.push({
+      starter: starter.value,
+      MainCourse: MainCourse.value,
+      Dessert: Dessert.value,
+    });
+
+    starter.value = "";
+    MainCourse.value = "";
+    Dessert.value = "";
+  } else {
+    alert("Veuillez remplir les champs !");
   }
-}
+};
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
 </style>

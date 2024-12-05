@@ -1,24 +1,3 @@
-<template>
-  <div>
-    <h1>Menu Cantine</h1>
-  </div>
-  <div>
-    <input type="text" v-model="starter" placeholder="Entrée" /><br />
-    <input type="text" v-model="MainCourse" placeholder="Plat" /><br />
-    <input type="text" v-model="Dessert" placeholder="Dessert" /><br />
-    <input type="text" v-model="note" placeholder="Note" />
-    <button @click="add">Ajouter</button>
-  </div> 
-  <div>
-    <h2>Liste des menus</h2>
-    <ul>
-      <li v-for="(item, index) in ListMenu" :key="index">
-        - Entrée : {{ item.starter }} - Plat : {{ item.MainCourse }} - Dessert :  {{ item.Dessert }} - Note : {{ item.note }} / 5
-      </li>
-    </ul>
-  </div>
-</template>
-
 <script setup>
 import { ref } from "vue";
 
@@ -55,6 +34,65 @@ const add = () => {
   }
 };
 </script>
+
+<template>
+  <div>
+    <h1 class="text-2xl font-bold text-center my-4">Menu Cantine</h1>
+
+    <div class="bg-gray-100 p-4 rounded shadow-md mb-6">
+      <h2 class="text-lg font-semibold mb-4">Ajouter un menu</h2>
+      <input
+        type="text"
+        v-model="starter"
+        placeholder="Entrée"
+        class="border p-2 rounded w-full mb-2"
+      />
+      <input
+        type="text"
+        v-model="MainCourse"
+        placeholder="Plat"
+        class="border p-2 rounded w-full mb-2"
+      />
+      <input
+        type="text"
+        v-model="Dessert"
+        placeholder="Dessert"
+        class="border p-2 rounded w-full mb-2"
+      />
+      <input
+        type="text"
+        v-model="note"
+        placeholder="Note"
+        class="border p-2 rounded w-full mb-2"
+      />
+      <button
+        @click="add"
+        class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+      >
+        Ajouter
+      </button>
+    </div>
+
+    <div class="bg-gray-100 p-4 rounded shadow-md">
+      <h2 class="text-lg font-semibold mb-4">Liste des menus</h2>
+      <!-- Carrousel -->
+      <div class="overflow-x-auto flex gap-4">
+        <div
+          v-for="(item, index) in ListMenu"
+          :key="index"
+          class="min-w-[250px] bg-white rounded shadow-md p-4 flex-shrink-0"
+        >
+          <h3 class="font-bold text-xl mb-2">Menu {{ index + 1 }}</h3>
+          <p><strong>Entrée :</strong> {{ item.starter }}</p>
+          <p><strong>Plat :</strong> {{ item.MainCourse }}</p>
+          <p><strong>Dessert :</strong> {{ item.Dessert }}</p>
+          <p><strong>Note :</strong> {{ item.note }} / 5</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
 
 <style>
 </style>

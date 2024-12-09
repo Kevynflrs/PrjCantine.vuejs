@@ -20,7 +20,7 @@
           v-model="newDish.dessert"
           placeholder="Dessert"
         />
-        <button @click="addDish">Ajouter le plat</button>
+        <button @click="addDish">Ajouter le menu</button>
       </div>
 
       <div class="counter">

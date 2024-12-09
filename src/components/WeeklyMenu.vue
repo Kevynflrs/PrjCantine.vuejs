@@ -1,8 +1,37 @@
 <template>
   <div class="weekly-menu">
-    <h2>Menus de la semaine</h2>
-
-    <div class="counter">
+    <div class="add-dish-form">
+      <h3>Ajouter un plat</h3>
+      <select v-model="dishDay" class="dish-select">
+        <option value="" disabled>Sélectionner un jour</option>
+        <option v-for="(menu, day) in weeklyMenus" :key="day" :value="day">
+          {{ daysOfWeek[day] }}
+        </option>
+      </select>
+      <input
+        type="text"
+        v-model="newDish.starter"
+        placeholder="Entrée"
+        class="dish-input"
+      />
+      <input
+        type="text"
+        v-model="newDish.mainCourse"
+        placeholder="Plat"
+        class="dish-input"
+      />
+      <input
+        type="text"
+        v-model="newDish.dessert"
+        placeholder="Dessert"
+        class="dish-input"
+      />
+      <div class="add-button-container">
+        <button @click="addDish" class="add-button">Ajouter le menu</button>
+      </div>
+    </div>
+  </div>
+  <div class="counter">
       <h4>Nombre total de plats ajoutés : {{ totalDishes }}</h4>
     </div>
 
@@ -46,38 +75,6 @@
         />
       </div>
     </div>
-
-    <div class="add-dish-form">
-      <h3>Ajouter un plat</h3>
-      <select v-model="dishDay" class="dish-select">
-        <option value="" disabled>Sélectionner un jour</option>
-        <option v-for="(menu, day) in weeklyMenus" :key="day" :value="day">
-          {{ daysOfWeek[day] }}
-        </option>
-      </select>
-      <input
-        type="text"
-        v-model="newDish.starter"
-        placeholder="Entrée"
-        class="dish-input"
-      />
-      <input
-        type="text"
-        v-model="newDish.mainCourse"
-        placeholder="Plat"
-        class="dish-input"
-      />
-      <input
-        type="text"
-        v-model="newDish.dessert"
-        placeholder="Dessert"
-        class="dish-input"
-      />
-      <div class="add-button-container">
-        <button @click="addDish" class="add-button">Ajouter le menu</button>
-      </div>
-    </div>
-  </div>
 </template>
 
 <script>
@@ -203,7 +200,7 @@ export default {
 }
 
 .dish-input:focus {
-  border-color: #4caf50;
+  border-color: #59A5D8;
   outline: none;
 }
 
@@ -218,7 +215,7 @@ export default {
 }
 
 .dish-select:focus {
-  border-color: #4caf50;
+  border-color: #59A5D8;
   outline: none;
 }
 
@@ -229,7 +226,7 @@ export default {
 .add-button {
   width: 100%;
   padding: 12px;
-  background-color: #4caf50;
+  background-color: #59A5D8;
   color: white;
   font-size: 1.2rem;
   border: none;
@@ -239,6 +236,6 @@ export default {
 }
 
 .add-button:hover {
-  background-color: #45a049;
+  background-color: #386FA4;
 }
 </style>

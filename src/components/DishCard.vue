@@ -42,7 +42,7 @@
     text-align: center;
   }
   button {
-    background-color: #4caf50;
+    background-color: #59A5D8;
     color: white;
     padding: 5px 10px;
     border: none;
@@ -50,7 +50,7 @@
     cursor: pointer;
   }
   button:hover {
-    background-color: #45a049;
+    background-color: #386FA4;
   }
   </style>
   

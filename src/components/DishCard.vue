@@ -35,9 +35,10 @@
   <style scoped>
   .dish-card {
     border: 1px solid #ddd;
-    border-radius: 5px;
-    padding: 10px;
-    margin: 10px 0;
+    background-color: #f0f2f6;
+    border-radius: 15px;
+    width: 200px;
+    height: 200px;
     text-align: center;
   }
   button {
@@ -45,11 +46,11 @@
     color: white;
     padding: 5px 10px;
     border: none;
-    border-radius: 3px;
+    border-radius: 4px;
     cursor: pointer;
   }
   button:hover {
-    background-color: #45a049;
+    background-color: #368e3a;
   }
   </style>
   

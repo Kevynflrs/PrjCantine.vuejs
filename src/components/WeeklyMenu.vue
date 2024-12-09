@@ -207,7 +207,7 @@
 
   .menu-dishes {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-around;
     gap: 10px;
     flex-wrap: wrap;
   }

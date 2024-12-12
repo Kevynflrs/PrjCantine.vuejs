@@ -1,87 +1,117 @@
 <template>
   <div class="weekly-menu">
     <div class="add-dish-form">
-      <h3>Ajouter un plat</h3>
-      <select v-model="dishDay" class="dish-select">
-        <option value="" disabled>Sélectionner un jour</option>
-        <option v-for="(menu, day) in weeklyMenus" :key="day" :value="day">
-          {{ daysOfWeek[day] }}
-        </option>
-      </select>
-      <input
-        type="text"
-        v-model="newDish.starter"
-        placeholder="Entrée"
-        class="dish-input"
-      />
-      <input
-        type="text"
-        v-model="newDish.mainCourse"
-        placeholder="Plat"
-        class="dish-input"
-      />
-      <input
-        type="text"
-        v-model="newDish.dessert"
-        placeholder="Dessert"
-        class="dish-input"
-      />
-      <div class="add-button-container">
-        <button @click="addDish" class="add-button">Ajouter le menu</button>
-      </div>
-    </div>
+  <h3>Ajouter un plat</h3>
+  
+  <!-- Input pour l'ajout des plats -->
+  <select v-model="dishDay" class="dish-select">
+    <option value="" disabled>Sélectionner un jour</option>
+    <option v-for="(menu, day) in weeklyMenus" :key="day" :value="day">
+      {{ daysOfWeek[day] }}
+    </option>
+  </select>
+  <input
+    type="text"
+    v-model="newDish.starter"
+    placeholder="Entrée"
+    class="dish-input"
+  />
+  <input
+    type="text"
+    v-model="newDish.mainCourse"
+    placeholder="Plat"
+    class="dish-input"
+  />
+  <input
+    type="text"
+    v-model="newDish.dessert"
+    placeholder="Dessert"
+    class="dish-input"
+  />
+  <div class="add-button-container">
+    <button @click="addDish" class="add-button">Ajouter le menu</button>
   </div>
-  <div class="counter">
-      <h4>Nombre total de plats ajoutés : {{ totalDishes }}</h4>
-    </div>
 
+  <div class="counter">
+    <h4>Nombre total de plats ajoutés : {{ totalDishes() }}</h4>
+  </div>
+</div>
+
+    <br>
+
+    <!-- Section avec les jours sous forme de boutons -->
     <div class="day-selector">
-      <h4>Choisir le jour</h4>
-      <select v-model="selectedDay">
-        <option :value="null" disabled>Sélectionnez un jour</option>
-        <option v-for="(menu, day) in weeklyMenus" :key="day" :value="day">
-          {{ daysOfWeek[day] }}
-        </option>
-      </select>
+      <div class="day-buttons">
+        <button
+          v-for="(day, index) in daysOfWeek"
+          :key="index"
+          :class="['day-button', { active: selectedDay === index }]"
+          @click="selectedDay = index"
+        >
+          {{ day }}
+        </button>
+      </div>
     </div>
 
     <div v-if="selectedDay !== null" :key="selectedDay" class="daily-menu">
-      <h3>{{ daysOfWeek[selectedDay] }}</h3>
 
-    <div v-for="(starter, index) in weeklyMenus[selectedDay].starters" :key="'starter-' + index" class="dish-card-container">
-      <DishCard
-        title="Entrée"
-        :description="starter.name"
-        :votes="starter.votes"
-        @vote="vote(starter)"
-        @edit="updateDishDescription('starter', index, $event)"
-        @remove="removeDish('starter', index)"
-      />
+      <!-- Row for starters -->
+      <div class="row row-starters">
+        <div
+          v-for="(starter, index) in weeklyMenus[selectedDay].starters"
+          :key="'starter-' + index"
+          class="dish-card-container"
+        >
+          <DishCard
+            title="Entrée"
+            :description="starter.name"
+            :votes="starter.votes"
+            @vote="vote(starter)"
+            @edit="updateDishDescription('starter', index, $event)"
+            @remove="removeDish('starter', index)"
+          />
+        </div>
+      </div>
+
+      <!-- Row for main courses -->
+      <div class="row row-main-courses">
+        <div
+          v-for="(main, index) in weeklyMenus[selectedDay].mainCourses"
+          :key="'mainCourse-' + index"
+          class="dish-card-container"
+        >
+          <DishCard
+            title="Plat"
+            :description="main.name"
+            :votes="main.votes"
+            @vote="vote(main)"
+            @edit="updateDishDescription('mainCourse', index, $event)"
+            @remove="removeDish('mainCourse', index)"
+          />
+        </div>
+      </div>
+
+      <!-- Row for desserts -->
+      <div class="row row-desserts">
+        <div
+          v-for="(dessert, index) in weeklyMenus[selectedDay].desserts"
+          :key="'dessert-' + index"
+          class="dish-card-container"
+        >
+          <DishCard
+            title="Dessert"
+            :description="dessert.name"
+            :votes="dessert.votes"
+            @vote="vote(dessert)"
+            @edit="updateDishDescription('dessert', index, $event)"
+            @remove="removeDish('dessert', index)"
+          />
+        </div>
+      </div>
     </div>
-
-<div v-for="(main, index) in weeklyMenus[selectedDay].mainCourses" :key="'mainCourse-' + index">
-  <DishCard
-    title="Plat"
-    :description="main.name"
-    :votes="main.votes"
-    @vote="vote(main)"
-    @edit="editDish(main, 'main', index)"
-    @remove="removeDish('main', index)"
-  />
-</div>
-
-<div v-for="(dessert, index) in weeklyMenus[selectedDay].desserts" :key="'dessert-' + index">
-  <DishCard
-    title="Dessert"
-    :description="dessert.name"
-    :votes="dessert.votes"
-    @vote="vote(dessert)"
-    @edit="editDish(dessert, 'dessert', index)"
-    @remove="removeDish('dessert', index)"
-  />
-</div>
-    </div>
+  </div>
 </template>
+
 
 <script>
 // Importer le composant DishCard
@@ -146,26 +176,38 @@ methods: {
       this.weeklyMenus[this.selectedDay][type + 's'].splice(index, 1);
     }
   },
-  // Méthode pour ajouter un plat
+  // Méthode pour calculer le nombre total de plats
+  totalDishes() {
+    let count = 0;
+    this.weeklyMenus.forEach(menu => {
+      count += menu.starters.length + menu.mainCourses.length + menu.desserts.length;
+    });
+    return count;
+  },
+
   addDish() {
     if (
-      this.newDish.starter &&
-      this.newDish.mainCourse &&
-      this.newDish.dessert &&
+      (this.newDish.starter || this.newDish.mainCourse || this.newDish.dessert) &&
       this.dishDay !== null
     ) {
-      this.weeklyMenus[this.dishDay].starters.push({ name: this.newDish.starter, votes: 0 });
-      this.weeklyMenus[this.dishDay].mainCourses.push({ name: this.newDish.mainCourse, votes: 0 });
-      this.weeklyMenus[this.dishDay].desserts.push({ name: this.newDish.dessert, votes: 0 });
-
+      if (this.newDish.starter) {
+        this.weeklyMenus[this.dishDay].starters.push({ name: this.newDish.starter, votes: 0 });
+      }
+      if (this.newDish.mainCourse) {
+        this.weeklyMenus[this.dishDay].mainCourses.push({ name: this.newDish.mainCourse, votes: 0 });
+      }
+      if (this.newDish.dessert) {
+        this.weeklyMenus[this.dishDay].desserts.push({ name: this.newDish.dessert, votes: 0 });
+      }
       this.newDish.starter = "";
       this.newDish.mainCourse = "";
       this.newDish.dessert = "";
       this.dishDay = null;
     } else {
-      alert("Veuillez remplir tous les champs et choisir un jour !");
+      alert("Veuillez remplir au moins un champ (Entrée, Plat ou Dessert) et choisir un jour !");
     }
   },
+
 
   vote(dish) {
     dish.votes++;
@@ -243,5 +285,89 @@ methods: {
 
 .add-button:hover {
   background-color: #386FA4;
+}
+
+.row {
+  margin-bottom: 20px;
+  padding: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center; /* Centre les cartes horizontalement */
+  align-items: center;    /* Centre les cartes verticalement */
+}
+
+.row h4 {
+  text-align: left;
+  font-size: 1.2rem;
+  color: #444;
+  margin-bottom: 10px;
+  width: 100%; /* Assure que le titre s'étend sur toute la largeur */
+}
+
+.dish-card-container {
+  display: inline-block;
+  margin: 10px;
+}
+
+.dish-card {
+  width: 180px;
+  border: 1px solid #ddd;
+  background-color: #f0f2f6;
+  border-radius: 8px;
+  padding: 15px;
+  text-align: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.dish-card h4 {
+  font-size: 1rem;
+  margin-bottom: 10px;
+}
+
+.dish-card p {
+  font-size: 0.9rem;
+  margin: 5px 0;
+}
+
+button {
+  background-color: #59a5d8;
+  color: white;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #386fa4;
+}
+
+.day-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.day-button {
+  padding: 10px 15px;
+  background-color: #f0f2f6;
+  color: #444;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.day-button.active {
+  background-color: #59a5d8;
+  color: white;
+  font-weight: bold;
+}
+
+.day-button:hover {
+  background-color: #386fa4;
+  color: white;
 }
 </style>

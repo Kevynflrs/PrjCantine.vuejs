@@ -48,32 +48,38 @@
     <div v-if="selectedDay !== null" :key="selectedDay" class="daily-menu">
       <h3>{{ daysOfWeek[selectedDay] }}</h3>
 
-      <div v-for="(starter, index) in weeklyMenus[selectedDay].starters" :key="'starter-' + index">
-        <DishCard
-          title="Entrée"
-          :description="starter"
-          :votes="weeklyMenus[selectedDay].votes.starter"
-          @vote="vote('starter', selectedDay)"
-        />
-      </div>
+    <div v-for="(starter, index) in weeklyMenus[selectedDay].starters" :key="'starter-' + index" class="dish-card-container">
+      <DishCard
+        title="Entrée"
+        :description="starter.name"
+        :votes="starter.votes"
+        @vote="vote(starter)"
+        @edit="updateDishDescription('starter', index, $event)"
+        @remove="removeDish('starter', index)"
+      />
+    </div>
 
-      <div v-for="(main, index) in weeklyMenus[selectedDay].mainCourses" :key="'mainCourse-' + index">
-        <DishCard
-          title="Plat"
-          :description="main"
-          :votes="weeklyMenus[selectedDay].votes.mainCourse"
-          @vote="vote('mainCourse', selectedDay)"
-        />
-      </div>
+<div v-for="(main, index) in weeklyMenus[selectedDay].mainCourses" :key="'mainCourse-' + index">
+  <DishCard
+    title="Plat"
+    :description="main.name"
+    :votes="main.votes"
+    @vote="vote(main)"
+    @edit="editDish(main, 'main', index)"
+    @remove="removeDish('main', index)"
+  />
+</div>
 
-      <div v-for="(dessert, index) in weeklyMenus[selectedDay].desserts" :key="'dessert-' + index">
-        <DishCard
-          title="Dessert"
-          :description="dessert"
-          :votes="weeklyMenus[selectedDay].votes.dessert"
-          @vote="vote('dessert', selectedDay)"
-        />
-      </div>
+<div v-for="(dessert, index) in weeklyMenus[selectedDay].desserts" :key="'dessert-' + index">
+  <DishCard
+    title="Dessert"
+    :description="dessert.name"
+    :votes="dessert.votes"
+    @vote="vote(dessert)"
+    @edit="editDish(dessert, 'dessert', index)"
+    @remove="removeDish('dessert', index)"
+  />
+</div>
     </div>
 </template>
 
@@ -86,86 +92,86 @@ export default {
     DishCard
   },
   data() {
-    return {
-      weeklyMenus: [],
-      newDish: {
-        starter: "",
-        mainCourse: "",
-        dessert: ""
-      },
-      selectedDay: null,
-      dishDay: null,
-      // Tableau des jours de la semaine
-      daysOfWeek: ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"],
-    };
-  },
-  computed: {
-    totalDishes() {
-      return this.weeklyMenus.reduce((total, menu) => {
-        return total +
-          (menu.starters.length) +
-          (menu.mainCourses.length) +
-          (menu.desserts.length);
-      }, 0);
+  return {
+    weeklyMenus: [],
+    newDish: {
+      starter: "",
+      mainCourse: "",
+      dessert: ""
+    },
+    selectedDay: null,
+    dishDay: null,
+    daysOfWeek: ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"]
+  };
+},
+methods: {
+  async fetchPlats() {
+    try {
+      const response = await fetch('https://tasty.p.rapidapi.com/recipes/list?from=0&size=20&tags=under_30_minutes', {
+        method: 'GET',
+        headers: {
+          'x-rapidapi-key': 'd6aac1fc7bmshadab676da5d5366p1f0beajsn6cb4f1dd1974',
+          'x-rapidapi-host': 'tasty.p.rapidapi.com',
+        }
+      });
+      const data = await response.json();
+      const dishes = data.results;
+
+      this.weeklyMenus = this.daysOfWeek.map(() => ({
+        starters: this.getRandomDishes(dishes, 2),
+        mainCourses: this.getRandomDishes(dishes, 3),
+        desserts: this.getRandomDishes(dishes, 2)
+      }));
+    } catch (error) {
+      console.error("Erreur lors de la récupération des plats de l'API", error);
     }
   },
-  methods: {
-    async fetchPlats() {
-      try {
-        const response = await fetch('https://tasty.p.rapidapi.com/recipes/list?from=0&size=20&tags=under_30_minutes', {
-          method: 'GET',
-          headers: {
-            'x-rapidapi-key': 'd6aac1fc7bmshadab676da5d5366p1f0beajsn6cb4f1dd1974',
-            'x-rapidapi-host': 'tasty.p.rapidapi.com',
-          }
-        });
-        const data = await response.json();
-        const dishes = data.results;
 
-        // On map les plats récupérés de l'API pour les organiser par type de plat
-        this.weeklyMenus = this.daysOfWeek.map(() => {
-          return {
-            starters: this.getRandomDishes(dishes, 2),      // 2 entrées par jour
-            mainCourses: this.getRandomDishes(dishes, 3),   // 3 plats par jour
-            desserts: this.getRandomDishes(dishes, 2),      // 2 desserts par jour
-            votes: { starter: 0, mainCourse: 0, dessert: 0 }
-          };
-        });
-      } catch (error) {
-        console.error("Erreur lors de la récupération des plats de l'API", error);
-      }
-    },
+  getRandomDishes(dishes, count) {
+    const shuffled = dishes.sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, count).map(dish => ({ name: dish.name, votes: 0 }));
+  },
 
-    // Fonction pour obtenir un nombre donné de plats aléatoires
-    getRandomDishes(dishes, count) {
-      const shuffled = dishes.sort(() => 0.5 - Math.random());
-      return shuffled.slice(0, count).map(dish => dish.name);
-    },
-
-    addDish() {
-      if (
-        this.newDish.starter &&
-        this.newDish.mainCourse &&
-        this.newDish.dessert &&
-        this.dishDay !== null
-      ) {
-        this.weeklyMenus[this.dishDay].starters.push(this.newDish.starter);
-        this.weeklyMenus[this.dishDay].mainCourses.push(this.newDish.mainCourse);
-        this.weeklyMenus[this.dishDay].desserts.push(this.newDish.dessert);
-
-        this.newDish.starter = "";
-        this.newDish.mainCourse = "";
-        this.newDish.dessert = "";
-        this.dishDay = null;
-      } else {
-        alert("Veuillez remplir tous les champs et choisir un jour !");
-      }
-    },
-
-    vote(type, day) {
-      this.weeklyMenus[day].votes[type]++;
+  editDish(dish, type, index) {
+    const newName = prompt(`Modifier le nom du plat (${dish.name}):`, dish.name);
+    if (newName !== null && newName.trim() !== "") {
+      this.weeklyMenus[this.selectedDay][type + 's'][index].name = newName.trim();
     }
   },
+  updateDishDescription(type, index, newDescription) {
+    this.weeklyMenus[this.selectedDay][type + 's'][index].name = newDescription;
+  },
+  removeDish(type, index) {
+    if (this.selectedDay !== null) {
+      this.weeklyMenus[this.selectedDay][type + 's'].splice(index, 1);
+    }
+  },
+  // Méthode pour ajouter un plat
+  addDish() {
+    if (
+      this.newDish.starter &&
+      this.newDish.mainCourse &&
+      this.newDish.dessert &&
+      this.dishDay !== null
+    ) {
+      this.weeklyMenus[this.dishDay].starters.push({ name: this.newDish.starter, votes: 0 });
+      this.weeklyMenus[this.dishDay].mainCourses.push({ name: this.newDish.mainCourse, votes: 0 });
+      this.weeklyMenus[this.dishDay].desserts.push({ name: this.newDish.dessert, votes: 0 });
+
+      this.newDish.starter = "";
+      this.newDish.mainCourse = "";
+      this.newDish.dessert = "";
+      this.dishDay = null;
+    } else {
+      alert("Veuillez remplir tous les champs et choisir un jour !");
+    }
+  },
+
+  vote(dish) {
+    dish.votes++;
+  }
+},
+
 
   mounted() {
     this.fetchPlats();

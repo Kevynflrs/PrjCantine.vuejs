@@ -45,26 +45,32 @@ export default {
   data() {
     return {
       isEditing: false,
-      editableDescription: this.description, // Valeur temporaire pour l'édition
+      editableDescription: this.description,
     };
   },
   methods: {
+    // Méthodes pour les boutons
     onVote() {
       this.$emit("vote");
     },
+    // Émet un événement pour supprimer le plat
     onRemove() {
       this.$emit("remove");
     },
+    // Émet un événement pour modifier la description
     startEdit() {
       this.isEditing = true;
     },
+    // Émet un événement pour sauvegarder la nouvelle description
     saveEdit() {
       this.isEditing = false;
-      this.$emit("edit", this.editableDescription); // Émet la nouvelle description vers le parent
+      this.$emit("edit", this.editableDescription);
     },
+
+    // Annule l'édition et réinitialise la description
     cancelEdit() {
       this.isEditing = false;
-      this.editableDescription = this.description; // Réinitialise à la valeur originale
+      this.editableDescription = this.description;
     },
   },
 };

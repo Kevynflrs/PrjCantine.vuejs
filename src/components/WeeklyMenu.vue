@@ -1,45 +1,42 @@
 <template>
   <div class="weekly-menu">
     <div class="add-dish-form">
-  <h3>Ajouter un plat</h3>
-  
-  <!-- Input pour l'ajout des plats -->
-  <select v-model="dishDay" class="dish-select">
-    <option value="" disabled>Sélectionner un jour</option>
-    <option v-for="(menu, day) in weeklyMenus" :key="day" :value="day">
-      {{ daysOfWeek[day] }}
-    </option>
-  </select>
-  <input
-    type="text"
-    v-model="newDish.starter"
-    placeholder="Entrée"
-    class="dish-input"
-  />
-  <input
-    type="text"
-    v-model="newDish.mainCourse"
-    placeholder="Plat"
-    class="dish-input"
-  />
-  <input
-    type="text"
-    v-model="newDish.dessert"
-    placeholder="Dessert"
-    class="dish-input"
-  />
-  <div class="add-button-container">
-    <button @click="addDish" class="add-button">Ajouter le menu</button>
-  </div>
+      <h3>Ajouter un plat</h3>
+      <select v-model="dishDay" class="dish-select">
+        <option value="" disabled>Sélectionner un jour</option>
+        <option v-for="(menu, day) in weeklyMenus" :key="day" :value="day">
+          {{ daysOfWeek[day] }}
+        </option>
+      </select>
+      <input
+        type="text"
+        v-model="newDish.starter"
+        placeholder="Entrée"
+        class="dish-input"
+      />
+      <input
+        type="text"
+        v-model="newDish.mainCourse"
+        placeholder="Plat"
+        class="dish-input"
+      />
+      <input
+        type="text"
+        v-model="newDish.dessert"
+        placeholder="Dessert"
+        class="dish-input"
+      />
+      <div class="add-button-container">
+        <button @click="addDish" class="add-button">Ajouter le menu</button>
+      </div>
 
-  <div class="counter">
-    <h4>Nombre total de plats ajoutés : {{ totalDishes() }}</h4>
-  </div>
-</div>
+      <div class="counter">
+        <h4>Nombre total de plats ajoutés : {{ totalDishes() }}</h4>
+      </div>
+    </div>
 
     <br>
 
-    <!-- Section avec les jours sous forme de boutons -->
     <div class="day-selector">
       <div class="day-buttons">
         <button
@@ -48,14 +45,12 @@
           :class="['day-button', { active: selectedDay === index }]"
           @click="selectedDay = index"
         >
-          {{ day }}
+        {{ day }}
         </button>
       </div>
     </div>
 
     <div v-if="selectedDay !== null" :key="selectedDay" class="daily-menu">
-
-      <!-- Row for starters -->
       <div class="row row-starters">
         <div
           v-for="(starter, index) in weeklyMenus[selectedDay].starters"
@@ -72,8 +67,6 @@
           />
         </div>
       </div>
-
-      <!-- Row for main courses -->
       <div class="row row-main-courses">
         <div
           v-for="(main, index) in weeklyMenus[selectedDay].mainCourses"
@@ -90,8 +83,6 @@
           />
         </div>
       </div>
-
-      <!-- Row for desserts -->
       <div class="row row-desserts">
         <div
           v-for="(dessert, index) in weeklyMenus[selectedDay].desserts"
@@ -112,9 +103,7 @@
   </div>
 </template>
 
-
 <script>
-// Importer le composant DishCard
 import DishCard from "./DishCard.vue";
 
 export default {
@@ -135,6 +124,8 @@ export default {
   };
 },
 methods: {
+
+  // Méthode pour récupérer les plats de l'API
   async fetchPlats() {
     try {
       const response = await fetch('https://tasty.p.rapidapi.com/recipes/list?from=0&size=20&tags=under_30_minutes', {
@@ -157,25 +148,32 @@ methods: {
     }
   },
 
+  // méthode pour obtenir un nombre aléatoire de plats
   getRandomDishes(dishes, count) {
     const shuffled = dishes.sort(() => 0.5 - Math.random());
     return shuffled.slice(0, count).map(dish => ({ name: dish.name, votes: 0 }));
   },
 
+  // Méthode pour éditer un plat
   editDish(dish, type, index) {
     const newName = prompt(`Modifier le nom du plat (${dish.name}):`, dish.name);
     if (newName !== null && newName.trim() !== "") {
       this.weeklyMenus[this.selectedDay][type + 's'][index].name = newName.trim();
     }
   },
+
+  // Méthode pour mettre à jour la description d'un plat
   updateDishDescription(type, index, newDescription) {
     this.weeklyMenus[this.selectedDay][type + 's'][index].name = newDescription;
   },
+
+  // Méthode pour supprimer un plat
   removeDish(type, index) {
     if (this.selectedDay !== null) {
       this.weeklyMenus[this.selectedDay][type + 's'].splice(index, 1);
     }
   },
+
   // Méthode pour calculer le nombre total de plats
   totalDishes() {
     let count = 0;
@@ -185,6 +183,7 @@ methods: {
     return count;
   },
 
+  // Méthode pour ajouter un plat 
   addDish() {
     if (
       (this.newDish.starter || this.newDish.mainCourse || this.newDish.dessert) &&
@@ -208,13 +207,13 @@ methods: {
     }
   },
 
-
+  // Méthode pour voter pour un plat
   vote(dish) {
     dish.votes++;
   }
 },
 
-
+  // Appel de la méthode fetchPlats lors de la création du composant
   mounted() {
     this.fetchPlats();
   }
@@ -292,8 +291,8 @@ methods: {
   padding: 10px;
   display: flex;
   flex-wrap: wrap;
-  justify-content: center; /* Centre les cartes horizontalement */
-  align-items: center;    /* Centre les cartes verticalement */
+  justify-content: center;
+  align-items: center;
 }
 
 .row h4 {
@@ -301,7 +300,7 @@ methods: {
   font-size: 1.2rem;
   color: #444;
   margin-bottom: 10px;
-  width: 100%; /* Assure que le titre s'étend sur toute la largeur */
+  width: 100%;
 }
 
 .dish-card-container {
